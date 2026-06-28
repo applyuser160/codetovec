@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Install nox
+        run: uv tool install nox
+
+      - name: Run tests with coverage
+        run: nox -t coverage
+
+      - name: Post coverage and benchmark comment
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Coverage data
+            const coverageData = JSON.parse(fs.readFileSync('./coverage.json', 'utf8'));
+            const files = coverageData.files;
+            
+            let coverageTable = `| File | Coverage | Pass |\n|------|----------|------|\n`;
+            
+            for (const [file, info] of Object.entries(files)) {
+              const pct = info.summary.percent_covered.toFixed(1);
+              const pass = info.summary.percent_covered >= 80
+                ? '<span style="color:green">〇</span>'
+                : '<span style="color:red">×</span>';
+              coverageTable += `| ${file} | ${pct}% | ${pass} |\n`;
+            }
+            
+            const totalPct = coverageData.totals.percent_covered.toFixed(1);
+            const totalPass = coverageData.totals.percent_covered >= 80
+              ? '<span style="color:green">〇</span>'
+              : '<span style="color:red">×</span>';
+            coverageTable += `\n**Total coverage: ${totalPct}% | ${totalPass}**`;
+            
+            const comment = `## 📈 Coverage Report\n\n${coverageTable}`;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
