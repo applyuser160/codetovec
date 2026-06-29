@@ -10,7 +10,11 @@ class CodeToVec:
     model: PreTrainedModel
     device: Literal["cpu", "gpu"]
 
-    def __init__(self, model_name: str, device: Literal["cpu", "gpu"]) -> None:
+    def __init__(
+        self,
+        model_name: str = "jinaai/jina-embeddings-v2-code-base",
+        device: Literal["cpu", "gpu"] = "cpu",
+    ) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, trust_remote_code=True
         )
