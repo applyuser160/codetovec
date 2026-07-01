@@ -12,7 +12,7 @@ class CodeToVec:
 
     def __init__(
         self,
-        model_name: str = "jinaai/jina-embeddings-v2-code-base",
+        model_name: str = "jinaai/jina-embeddings-v2-base-code",
         device: Literal["cpu", "gpu"] = "cpu",
     ) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained(
