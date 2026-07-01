@@ -2,11 +2,16 @@ from typing import Literal
 
 import torch
 import torch.nn.functional as F
-from transformers import AutoModel, AutoTokenizer, PreTrainedModel, TokenizersBackend
+from transformers import (
+    AutoModel,
+    AutoTokenizer,
+    PreTrainedModel,
+    PreTrainedTokenizerBase,
+)
 
 
 class CodeToVec:
-    tokenizer: TokenizersBackend
+    tokenizer: PreTrainedTokenizerBase
     model: PreTrainedModel
     device: Literal["cpu", "gpu"]
 
