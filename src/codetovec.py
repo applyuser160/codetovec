@@ -81,9 +81,7 @@ class CodeToVec:
             result = tokenize.untokenize(out_tokens)
 
             if remove_blank_lines:
-                result = "\n".join(
-                    line for line in result.splitlines() if line.strip()
-                )
+                result = "\n".join(line for line in result.splitlines() if line.strip())
 
             return result
         except tokenize.TokenError:
@@ -109,9 +107,6 @@ class CodeToVec:
         # ベクトル抽出
         with torch.no_grad():
             model_output = self.model(**encoded_text)
-
-            # 先頭トークンのベクトルを取得し、L2正規化を行う
-            # _attention_mask = encoded_text.get("attention_mask")
 
             # 先頭トークン[CLS]の抽出
             embeddings = model_output.last_hidden_state[:, 0, :]
