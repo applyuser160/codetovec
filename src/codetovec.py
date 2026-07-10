@@ -17,7 +17,7 @@ class CodeToVec:
 
     def __init__(
         self,
-        model_name: str = "jinaai/jina-embeddings-v2-base-code",
+        model_name: str = "jinaai/jina-bert-v2-qk-post-norm",
         device: Literal["cpu", "gpu"] = "cpu",
     ) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained(
